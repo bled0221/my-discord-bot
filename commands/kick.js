@@ -20,7 +20,7 @@ module.exports = {
         if (!interaction.member.permissions.has('KickMembers')) {
             await interaction.reply({ 
                 content: '❌ 당신은 권한이 없습니다! (멤버 추방 권한이 필요합니다)', 
-                ephemeral: true // 🤫 쓴 사람한테만 보임
+                ephemeral: true 
             });
             // ⏰ 3초 후 비밀 메시지 삭제
             setTimeout(() => interaction.deleteReply().catch(console.error), 3000);
@@ -34,6 +34,17 @@ module.exports = {
         if (!targetMember) {
             await interaction.reply({ 
                 content: '❌ 서버에서 해당 멤버를 찾을 수 없습니다.', 
+                ephemeral: true 
+            });
+            // ⏰ 3초 후 비밀 메시지 삭제
+            setTimeout(() => interaction.deleteReply().catch(console.error), 3000);
+            return;
+        }
+
+        // 🛡️ [추가 예외 처리] 만약 추방하려는 대상이 봇 자신(Open Claw)일 경우
+        if (targetMember.id === interaction.client.user.id) {
+            await interaction.reply({ 
+                content: '저를 추방할 수는 없습니다! 제가 마음에 안 드시나요..? 🥺', 
                 ephemeral: true 
             });
             // ⏰ 3초 후 비밀 메시지 삭제
@@ -67,7 +78,7 @@ module.exports = {
             // 💡 진짜로 서버에서 추방하기
             await targetMember.kick(reason);
 
-            // 📢 채팅방에 보여줄 성공 메시지 (이건 모두가 봐야 하니까 ephemeral 없음, 영구 유지)
+            // 📢 채팅방에 보여줄 성공 메시지
             if (reason) {
                 await interaction.reply({ 
                     content: `👋 **${targetMember.user.tag}** 님이 서버에서 추방되었습니다.\n📄 **사유:** ${reason}` 
