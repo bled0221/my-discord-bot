@@ -1,23 +1,55 @@
-// commands/dev-serverlist.js
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require('discord.js');
+
 module.exports = {
     name: '!서버목록',
     async execute(message) {
         const developerID = process.env.DEVELOPER_ID;
+        if (message.author.id !== developerID) return;
 
-        // 권한 확인 (본인인지)
-        if (message.author.id !== developerID) {
-            // 너가 아닐 경우 반응하지 않거나, 원한다면 메시지를 보낼 수 있음
-            return; 
-        }
+        const guilds = Array.from(message.client.guilds.cache.values());
+        const itemsPerPage = 10;
+        let page = 0;
+        const maxPage = Math.ceil(guilds.length / itemsPerPage) - 1;
 
-        // 서버 목록 가져오기
-        const guildList = message.client.guilds.cache
-            .map(g => `• **${g.name}** (ID: ${g.id})`)
-            .join('\n');
+        const getEmbed = (page) => {
+            const start = page * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageGuilds = guilds.slice(start, end);
+            
+            const guildList = pageGuilds
+                .map(g => `• **${g.name}**\n\`ID: ${g.id}\``)
+                .join('\n\n');
 
-        // 메시지를 보낸 채널에 바로 출력
-        await message.reply({
-            content: `현재 **${message.client.guilds.cache.size}**개의 서버에 참여 중입니다:\n\n${guildList}`
+            return new EmbedBuilder()
+                .setColor(0x0099FF)
+                // 💡 여기! 타이틀에 서버 개수를 포함했어
+                .setTitle(`참여 중인 서버 목록 (${guilds.length}개 서버)`)
+                .setDescription(guildList || '참여 중인 서버가 없습니다.')
+                // 💡 풋터에는 페이지 정보만 남겨서 훨씬 깔끔해졌어
+                .setFooter({ text: `페이지 ${page + 1} / ${maxPage + 1}` });
+        };
+
+        const getRow = (page) => {
+            return new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId('prev').setLabel('◀ 이전').setStyle(ButtonStyle.Primary).setDisabled(page === 0),
+                new ButtonBuilder().setCustomId('next').setLabel('다음 ▶').setStyle(ButtonStyle.Primary).setDisabled(page >= maxPage)
+            );
+        };
+
+        const response = await message.reply({ 
+            embeds: [getEmbed(page)], 
+            components: [getRow(page)] 
+        });
+
+        const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 300000 });
+
+        collector.on('collect', async i => {
+            if (i.user.id !== developerID) return i.reply({ content: '개발자만 제어할 수 있습니다.', ephemeral: true });
+
+            if (i.customId === 'prev') page--;
+            else if (i.customId === 'next') page++;
+
+            await i.update({ embeds: [getEmbed(page)], components: [getRow(page)] });
         });
     },
 };
