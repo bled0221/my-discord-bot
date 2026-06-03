@@ -61,6 +61,7 @@ module.exports = {
                 .setTitle(`[${interaction.guild.name}] 서버 추방 안내`)
                 .setDescription(`**${targetMember.user.username}**님은 **${interaction.guild.name}** 에서 추방되었음을 알려드립니다.`)
                 .addFields(
+                    { name: '대상', value: `<@${targetMember.id}>`, inline: true },
                     { name: '사유', value: reason, inline: false },
                     { name: '담당 관리자', value: `${interaction.user.tag} (${interaction.user.id})`, inline: false }
                 )

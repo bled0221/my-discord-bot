@@ -55,6 +55,7 @@ module.exports = {
                 .setTitle('타임아웃 해제 완료')
                 .setDescription(`**${targetMember.user.tag}** 님의 타임아웃이 해제되었습니다.`)
                 .addFields(
+                    { name: '대상', value: `<@${targetMember.id}>`, inline: true },
                     { name: '담당 관리자', value: `<@${interaction.user.id}>`, inline: true },
                     { name: '사유', value: reason, inline: false }
                 )
