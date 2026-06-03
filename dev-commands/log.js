@@ -18,7 +18,6 @@ module.exports = {
             const data = fs.readFileSync('command-logs.txt', 'utf8');
             const lines = data.split('\n').filter(line => line.trim() !== '');
             
-            // 검색: 해당 서버ID가 포함된 줄만 필터링
             const logs = lines.filter(line => line.includes(targetGuildId));
 
             if (logs.length === 0) {
@@ -33,16 +32,14 @@ module.exports = {
                 const start = pageIndex * pageSize;
                 const end = start + pageSize;
                 
-                // 코드 블록을 제거하고 멘션이 동작하도록 텍스트로 구성
                 const pageLogs = logs.slice(start, end).map(line => {
-                    // 유저ID: 123... 부분을 <@123...>로 변경
                     return line.replace(/유저ID: (\d+)/g, (match, userId) => `유저ID: <@${userId}>`);
                 }).join('\n');
 
                 return new EmbedBuilder()
                     .setTitle(`📜 서버 로그 (${pageIndex + 1}/${totalPages})`)
-                    .setDescription(pageLogs || '기록 없음') // 코드 블록(```) 삭제
-                    .setColor(0x72767d); // 요청하신 색상 적용
+                    .setDescription(pageLogs || '기록 없음')
+                    .setColor(0x72767d);
             };
 
             const row = new ActionRowBuilder().addComponents(

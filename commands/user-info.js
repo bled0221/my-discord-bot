@@ -61,7 +61,7 @@ module.exports = {
 
         // 💡 [최종 레이아웃 고정] 작은 상단 프로필 + 촘촘한 간격 + 배지 모양 통일
         const userEmbed = new EmbedBuilder()
-            .setColor('#72767d')
+            .setColor(0x72767d) // 💡 문자열 '#72767d'를 다른 파일들과 같이 숫자형 0x72767d로 통일하여 교체
             .setAuthor({ 
                 name: displayName, 
                 iconURL: targetUser.displayAvatarURL({ dynamic: true, size: 128 }) 
@@ -70,7 +70,7 @@ module.exports = {
                 `**🆔 계정 유형**\n${userType}\n\n` + 
                 `**⏳ 디스코드 가입일**\n${joinedDiscordDate} (${joinedDiscordTime})\n\n` + 
                 `**🛬 서버 착륙일**\n${joinedServerDate} (${joinedServerTime})\n\n` + 
-                `**🎖️ 보유 중인 역할**\n${finalRoles}` // 👈 이제 모두 같은 동글동글한 배지로 출력됨!
+                `**🎖️ 보유 중인 역할**\n${finalRoles}`
             )
             .setTimestamp();
 

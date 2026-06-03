@@ -2,6 +2,7 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentTyp
 
 module.exports = {
     name: '!서버목록',
+    developerOnly: true,
     async execute(message) {
         const developerID = process.env.DEVELOPER_ID;
         if (message.author.id !== developerID) return;

@@ -57,7 +57,7 @@ module.exports = {
         try {
             // 💡 1. 차단당한 사람에게 보낼 DM 임베드 생성
             const dmEmbed = new EmbedBuilder()
-                .setColor('#72767d')
+                .setColor(0x72767d)
                 .setTitle(`[${interaction.guild.name}] 서버 차단 안내`)
                 .setDescription(`**${targetMember.user.username}**님은 **${interaction.guild.name}** 에서 차단되었음을 알려드립니다.`)
                 .addFields(
@@ -78,7 +78,7 @@ module.exports = {
 
             // 💡 3. 서버 채팅방에 보여줄 성공 임베드
             const successEmbed = new EmbedBuilder()
-                .setColor('#72767d')
+                .setColor(0x72767d)
                 .setTitle('멤버 차단 완료')
                 .setDescription(`**${targetMember.user.tag}** 님이 서버에서 차단되었습니다.`)
                 .addFields(

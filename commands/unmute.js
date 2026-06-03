@@ -21,12 +21,13 @@ module.exports = {
         if (!interaction.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
             await interaction.reply({ 
                 content: '❌ 당신은 권한이 없습니다! (멤버 관리 권한이 필요합니다)', 
-                flags: MessageFlags.Ephemeral 
+                flags: [MessageFlags.Ephemeral] // 최신 배열 형식으로 안전하게 수정
             });
             setTimeout(() => interaction.deleteReply().catch(console.error), 3000);
             return;
         }
 
+        // 💡 중요: 모두에게 보이게 해제를 알릴 것이므로 deferReply는 flags를 넣지 않고 기본값으로 둡니다.
         await interaction.deferReply();
 
         const targetMember = interaction.options.getMember('멤버');
@@ -49,9 +50,9 @@ module.exports = {
             // 💡 타임아웃 해제 (시간을 null로 설정)
             await targetMember.timeout(null, reason);
 
-            // 💡 성공 임베드
+            // 💡 성공 임베드 (색상을 정수형태 0x72767d로 수정)
             const successEmbed = new EmbedBuilder()
-                .setColor('#72767d')
+                .setColor(0x72767d)
                 .setTitle('타임아웃 해제 완료')
                 .setDescription(`**${targetMember.user.tag}** 님의 타임아웃이 해제되었습니다.`)
                 .addFields(

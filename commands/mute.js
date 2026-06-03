@@ -1,4 +1,4 @@
-// commands/timeout.js
+// commands/mute.js
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, MessageFlags } = require('discord.js');
 
 module.exports = {
@@ -25,7 +25,7 @@ module.exports = {
         if (!interaction.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
             await interaction.reply({ 
                 content: '❌ 당신은 권한이 없습니다! (멤버 관리 권한이 필요합니다)', 
-                flags: MessageFlags.Ephemeral 
+                flags: [MessageFlags.Ephemeral] // 최신 배열 형식으로 수정 완료
             });
             setTimeout(() => interaction.deleteReply().catch(console.error), 3000);
             return;
@@ -69,9 +69,9 @@ module.exports = {
             // 💡 타임아웃 실행 (밀리초 단위 변환)
             await targetMember.timeout(minutes * 60 * 1000, reason);
 
-            // 💡 성공 임베드 (image_56df89.png 스타일)
+            // 💡 성공 임베드 (색상을 숫자 형태 0x72767d로 수정)
             const successEmbed = new EmbedBuilder()
-                .setColor('#72767d')
+                .setColor(0x72767d)
                 .setTitle('타임아웃 완료')
                 .setDescription(`**${targetMember.user.tag}** 님이 ${minutes}분 동안 타임아웃 되었습니다.`)
                 .addFields(

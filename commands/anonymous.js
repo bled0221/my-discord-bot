@@ -55,7 +55,7 @@ module.exports = {
 
         // 만능 회색(#72767d) 익명 박스(임베드) 꾸미기
         const anonymousEmbed = new EmbedBuilder()
-            .setColor('#72767d')
+            .setColor(0x72767d)
             .setTitle('익명 메시지')
             .setDescription(`"${content}"`)
             .setTimestamp()
