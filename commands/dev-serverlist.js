@@ -16,12 +16,16 @@ module.exports = {
             const end = start + itemsPerPage;
             const pageGuilds = guilds.slice(start, end);
             
+            // 기호(•) 제거, 서버 주인 멘션(<@ID>) 추가, 상세 정보 포함
             const guildList = pageGuilds
-                .map(g => `• **${g.name}**\n\`ID: ${g.id}\``)
+                .map(g => {
+                    const ownerMention = `<@${g.ownerId}>`;
+                    return `**${g.name}**\n\`ID: ${g.id}\` | 멤버: ${g.memberCount}명\n주인: ${ownerMention}`;
+                })
                 .join('\n\n');
 
             return new EmbedBuilder()
-                .setColor(0x72767d) // 적용 완료!
+                .setColor(0x72767d)
                 .setTitle(`참여 중인 서버 목록 (${guilds.length}개 서버)`)
                 .setDescription(guildList || '참여 중인 서버가 없습니다.')
                 .setFooter({ text: `페이지 ${page + 1} / ${maxPage + 1}` });
