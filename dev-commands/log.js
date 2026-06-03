@@ -10,43 +10,59 @@ module.exports = {
 
         if (!targetGuildId) return message.reply('❌ 사용법: `!로그 [서버ID]`');
 
-        const data = fs.readFileSync('command-logs.txt', 'utf8');
-        const logs = data.split('\n').filter(line => line.includes(`서버ID: ${targetGuildId}`));
+        try {
+            if (!fs.existsSync('command-logs.txt')) {
+                return message.reply('⚠️ `command-logs.txt` 파일이 존재하지 않습니다.');
+            }
 
-        if (logs.length === 0) return message.reply('📭 해당 서버의 기록이 없습니다.');
+            const data = fs.readFileSync('command-logs.txt', 'utf8');
+            const lines = data.split('\n').filter(line => line.trim() !== '');
+            
+            // 검색: 해당 서버ID가 포함된 줄만 필터링
+            const logs = lines.filter(line => line.includes(targetGuildId));
 
-        // 5개씩 페이지 나누기
-        const pageSize = 5;
-        let page = 0;
-        const totalPages = Math.ceil(logs.length / pageSize);
+            if (logs.length === 0) {
+                return message.reply(`📭 해당 서버 ID(${targetGuildId})에 대한 기록을 찾을 수 없습니다.`);
+            }
 
-        const generateEmbed = (pageIndex) => {
-            const start = pageIndex * pageSize;
-            const end = start + pageSize;
-            const pageLogs = logs.slice(start, end).join('\n');
-            return new EmbedBuilder()
-                .setTitle(`📜 서버 로그 (${pageIndex + 1}/${totalPages})`)
-                .setDescription(`\`\`\`${pageLogs || '기록 없음'}\`\`\``)
-                .setColor(0x0099ff);
-        };
+            const pageSize = 5;
+            let page = 0;
+            const totalPages = Math.ceil(logs.length / pageSize);
 
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId('prev').setLabel('이전').setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId('next').setLabel('다음').setStyle(ButtonStyle.Primary)
-        );
+            const generateEmbed = (pageIndex) => {
+                const start = pageIndex * pageSize;
+                const end = start + pageSize;
+                
+                // 코드 블록을 제거하고 멘션이 동작하도록 텍스트로 구성
+                const pageLogs = logs.slice(start, end).map(line => {
+                    // 유저ID: 123... 부분을 <@123...>로 변경
+                    return line.replace(/유저ID: (\d+)/g, (match, userId) => `유저ID: <@${userId}>`);
+                }).join('\n');
 
-        const response = await message.reply({ embeds: [generateEmbed(page)], components: [row] });
+                return new EmbedBuilder()
+                    .setTitle(`📜 서버 로그 (${pageIndex + 1}/${totalPages})`)
+                    .setDescription(pageLogs || '기록 없음') // 코드 블록(```) 삭제
+                    .setColor(0x72767d); // 요청하신 색상 적용
+            };
 
-        // 버튼 클릭 이벤트 처리
-        const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+            const row = new ActionRowBuilder().addComponents(
+                new ButtonBuilder().setCustomId('prev').setLabel('이전').setStyle(ButtonStyle.Primary),
+                new ButtonBuilder().setCustomId('next').setLabel('다음').setStyle(ButtonStyle.Primary)
+            );
 
-        collector.on('collect', async i => {
-            if (i.user.id !== message.author.id) return i.reply({ content: '직접 사용하세요!', ephemeral: true });
+            const response = await message.reply({ embeds: [generateEmbed(page)], components: [row] });
 
-            if (i.customId === 'prev') page = page > 0 ? --page : totalPages - 1;
-            else page = page < totalPages - 1 ? ++page : 0;
+            const collector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+            collector.on('collect', async i => {
+                if (i.user.id !== message.author.id) return i.reply({ content: '직접 사용하세요!', ephemeral: true });
+                if (i.customId === 'prev') page = page > 0 ? --page : totalPages - 1;
+                else page = page < totalPages - 1 ? ++page : 0;
+                await i.update({ embeds: [generateEmbed(page)], components: [row] });
+            });
 
-            await i.update({ embeds: [generateEmbed(page)], components: [row] });
-        });
+        } catch (error) {
+            console.error(error);
+            message.reply('⚠️ 오류 발생: ' + error.message);
+        }
     }
 };
