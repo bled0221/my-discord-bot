@@ -37,7 +37,7 @@ module.exports = {
             
             const deletedMessages = await interaction.channel.bulkDelete(amount, true);
             
-            await interaction.editReply({ content: `✨ 성공적으로 ${deletedMessages.size}개의 메시지를 청소했습니다!` });
+            await interaction.editReply({ content: `성공적으로 ${deletedMessages.size}개의 메시지를 청소했습니다!` });
 
             setTimeout(async () => {
                 try {
